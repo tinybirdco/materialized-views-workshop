@@ -56,14 +56,10 @@ None of these statements and functions have the wider data context needed to pro
 ### Caution when chaining MVs together
 ReplacingMergeTrees (RMTs) are commonly used to deduplicate data. Meanwhile, AggregatingMergeTrees (AMTs)are used to make aggregations very fast since they pre-compute the aggregations when data is ingested. So these calculations are done once instead of with every query. It's probably not a surprise that many of us would want to push data through a RMT and feed those resulting to an AMT.  First, get the data deduplicated, and then set up the aggregations. However, this chaining of table engines does not behave as expected, and this design may result in duplicate data existing 'downstream' of the RMT. 
 
+Deduplication in ClickHouse happens asynchronously, during merges, which you cannot force in Tinybird. That's why you always have to add FINAL or the -Merge functions when querying ([more details here](https://www.tinybird.co/docs/guides/publishing-data/master-materialized-views#doing-aggregations-the-right-way-with-materialized-views).
 
-
-
-
-
-
-
-![landing](images/RMT-ATM-fail.png)
+Materialized Views only see the block of data that is being processed at the time, so when materializing an aggregation, it will process any new row, no matter if it was a new id or a duplicated id. That's why this pattern fails.
+![landing](images/RMT-AMT-fail.png)
 
 ## Source data
 
