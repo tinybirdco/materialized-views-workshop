@@ -4,11 +4,11 @@ This repository is a companion piece to the 'Materialized Views' workshop. The i
 
 ## Common use cases for Materialized Views
 
-* Updating schemas:
-  * Dropping columns to focus on attributes of interest and reduce the amount of data processed.
-  * Updating sorting keys. As you serve more and more use cases, with incoming queries focused on different data attributes, you may benefit from providing MV-driven Data Sources with different sorting keys. For example, you may want to organize data by product IDs and customer IDs. 
-* Managing duplicate data. When receiving duplicate data, a ReplacingMergreTree-based MV is one common strategy. Due to how ClickHouse implements MVs, you can trigger the merge process to get deduplicated data.
-* AggregatingMergeTree-based MVs enable you to pre-compute aggregations (counts, sums, averages, mins, and maxes) as the data arrives. So, the work to aggregate is done once when data is arrived, and not at query time. When you have high volumes of aggregation-based queries, a MV can help. 
+* **Updating schemas**:
+  * **Dropping columns** to focus on attributes of interest and reduce the amount of data processed.
+  * **Updating sorting keys**. As you serve more and more use cases, with incoming queries focused on different data attributes, you may benefit from providing MV-driven Data Sources with different sorting keys. For example, you may want to organize data by product IDs and customer IDs. 
+* **Managing duplicate data**. When receiving duplicate data, a ReplacingMergreTree-based MV is one common strategy. Due to how ClickHouse implements MVs, you can trigger the merge process to get deduplicated data.
+* AggregatingMergeTree-based MVs enable you to **pre-compute aggregations** (counts, sums, averages, mins, and maxes) as the data arrives. So, the work to aggregate is done once when data is arrived, and not at query time. When you have high volumes of aggregation-based queries, a MV can help. 
 
 ## Resources
 
@@ -60,6 +60,21 @@ Deduplication in ClickHouse happens asynchronously, during merges, which you can
 
 Materialized Views only see the block of data that is being processed at the time, so when materializing an aggregation, it will process any new row, no matter if it was a new id or a duplicated id. That's why this pattern fails.
 ![landing](images/RMT-AMT-fail.png)
+
+RMT MVs should only feed other RMTs to maintain the promise of deduplicated data.  
+
+## Database table engines 
+
+* MergeTree -  is the foundational storage engine for ClickHouse and serves as the core of its more specialized engines.
+   * Uses columnar storage, meaning data for each column is stored separately. This design drastically reduces I/O for analytical queries that often only need a subset of the columns, leading to significant performance improvements.
+   * can handle large volumes of data, both in terms of storage size and the number of rows. It is designed to work efficiently on a single node or across distributed clusters.
+   * is optimized for fast data ingestion and querying, making it suitable for scenarios involving high-throughput insertions and complex analytical queries.
+* ReplacingMergeTree - is best when you need to manage the latest version of data or remove duplicates, particularly in time-series data with potential repeated events.
+* AggregatingMergeTree - is ideal for situations requiring data pre-aggregation, reducing the computational load during read queries. This is especially valuable for dashboards and analytics.
+* CollapsingMergeTree (and VersionedCollapsingMegreTree) - designed for scenarios where you need to track changes (like deletions) without actually removing data immediately from the storage. Instead of directly deleting rows, CollapsingMergeTree uses a special column called `sign` to mark the state of each row.
+   * The sign column is crucial in CollapsingMergeTree and must be managed entirely by the client (application).
+   * sign = 1: Indicates a valid (current) row, representing the latest state or addition of data.
+   * sign = -1: Indicates that the corresponding row should be considered as "removed," "forgotten," or logically deleted. This does not delete the row immediately; it marks it for removal during future merges.  
 
 ## Source data
 
