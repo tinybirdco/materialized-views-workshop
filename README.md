@@ -39,11 +39,31 @@ In addition, here is a diagram from a [ClickHouse article about its design](http
 
 ![landing](images/clickhouse-mv-aggregating-merges.png)
 
-
-
-
 ## Important notes
 
+As MVs are managed, incoming data is stored in intermediate *blocks* of data. These data are processed by a transforming Pipe and prepared for merging into the already processed data. This merge process happens every few minutes, and it can also be triggered by the use of -Merge functions and the FINAL keyword. This ability to trigger a merge when wanted makes the Tinybird/ClickHouse implemenation of MVs extremely useful for real-time processing and analysis. 
+
+### SQL clauses to avoid
+
+Since MVs and their transformation Pipes acts on these blocks of data, some standard SQL functionality will not behave as expected:
+* LIMIT
+* ORDER BY
+* DISTINCT
+* Window functions
+
+None of these statements and functions have the wider data context needed to produce useful results. 
+
+### Caution when chaining MVs together
+ReplacingMergeTrees (RMTs) are commonly used to deduplicate data. Meanwhile, AggregatingMergeTrees (AMTs)are used to make aggregations very fast since they pre-compute the aggregations when data is ingested. So these calculations are done once instead of with every query. It's probably not a surprise that many of us would want to push data through a RMT and feed those resulting to an AMT.  First, get the data deduplicated, and then set up the aggregations. However, this chaining of table engines does not behave as expected, and this design may result in duplicate data existing 'downstream' of the RMT. 
+
+
+
+
+
+
+
+
+![landing](images/RMT-ATM-fail.png)
 
 ## Source data
 
