@@ -35,12 +35,23 @@ Here are descriptions of these components:
 ![landing](images/data_source_mv.png)
 ![landing](images/publishing_pipes.png)
 
+In addition, here is a diagram from a [ClickHouse article about its design](https://www.vldb.org/pvldb/vol17/p3731-schulze.pdf).
+
+![landing](images/clickhouse-mv-aggregating-merges.png)
+
+
+
+
+## Important notes
+
 
 ## Source data
 
 ### Data generation
 
 In this workshop we start with a Python data generator script that is creating a stream of *estore events*. These are product-related events that users trigger while navigating an estore app. Each event includes an *action type* that describes the action the customer took. 
+
+Python [estore event stream script](https://github.com/tinybirdco/materialized-views-workshop/blob/main/data-gen/estore-event-stream.py).
 
 ### `action` types
 
