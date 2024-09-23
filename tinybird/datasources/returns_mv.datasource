@@ -1,0 +1,13 @@
+# Data Source created from Pipe 'feed_returns_mv'
+
+SCHEMA >
+    `timestamp` DateTime,
+    `product_id` String,
+    `customer_id` String,
+    `brand` String,
+    `model` String,
+    `price` Float32
+
+ENGINE "MergeTree"
+ENGINE_PARTITION_KEY "toYYYYMM(timestamp)"
+ENGINE_SORTING_KEY "timestamp, customer_id, product_id"

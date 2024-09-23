@@ -1,0 +1,12 @@
+NODE JOIN_on_product
+SQL >
+
+    SELECT timestamp, product_id, customer_id, p.brand, p.model, p.price
+    FROM estore_stream es JOIN products p
+    ON es.product_id = p.product_id
+    WHERE action = 'return'
+
+TYPE materialized
+DATASOURCE returns_mv
+
+

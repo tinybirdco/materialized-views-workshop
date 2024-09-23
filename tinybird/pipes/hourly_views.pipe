@@ -1,0 +1,10 @@
+NODE endpoint
+SQL >
+
+    SELECT timestamp,
+        countMerge(views) AS views
+    FROM hourly_views_mv
+    GROUP BY timestamp
+    ORDER BY timestamp DESC
+
+

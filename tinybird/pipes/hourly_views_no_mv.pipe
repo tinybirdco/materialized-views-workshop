@@ -1,0 +1,12 @@
+NODE endpoint
+SQL >
+
+    SELECT
+        toStartOfHour(timestamp) AS hour,
+        count() AS views
+    FROM estore_stream
+    WHERE action = 'view'
+    GROUP BY hour
+    ORDER BY hour DESC
+
+

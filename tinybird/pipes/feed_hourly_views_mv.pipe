@@ -1,0 +1,14 @@
+NODE endpoint
+SQL >
+
+    SELECT
+        toStartOfHour(timestamp) AS timestamp,
+        countState() AS views
+    FROM estore_stream
+    WHERE action = 'view'
+    GROUP BY timestamp
+
+TYPE materialized
+DATASOURCE hourly_views_mv
+
+

@@ -1,0 +1,13 @@
+NODE get_hourly_sums
+SQL >
+
+    SELECT
+        toStartOfHour(timestamp) AS timestamp,
+        sumState(price) AS revenue
+    FROM purchases_mv
+    GROUP BY timestamp
+
+TYPE materialized
+DATASOURCE hourly_revenue_mv
+
+
