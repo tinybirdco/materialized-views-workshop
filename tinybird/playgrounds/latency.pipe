@@ -1,0 +1,22 @@
+NODE from_shared
+SQL >
+
+    SELECT timestamp, product_id, NOW() - timestamp AS seconds_ago 
+    -- FROM estore_stream
+    FROM database_engines.estore_stream
+    WHERE timestamp > NOW() - INTERVAL 7 DAYS
+    ORDER BY timestamp DESC
+
+
+
+NODE from_local
+SQL >
+
+    SELECT timestamp, product_id, NOW() - timestamp AS seconds_ago 
+    -- FROM estore_stream
+    FROM estore_stream
+    WHERE timestamp > NOW() - INTERVAL 7 DAYS
+    ORDER BY timestamp DESC
+    LIMIT 100
+
+
