@@ -260,6 +260,10 @@ DATASOURCE hourly_sales_summing_mv
 
 ## Queries
 
+With 1.2M purchases in the `purchases_mv` table, these queries are not showing much different in data process or query latencies.
+
+Each process around 4.2KB in 20-30ms. Probably need more data to get a better comparison when there is real world to be done. 
+
 `get_summing`
 ```sql
 SELECT
