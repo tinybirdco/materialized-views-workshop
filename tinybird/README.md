@@ -162,3 +162,119 @@ WHERE timestamp > NOW() - INTERVAL 7 DAYS
 GROUP BY timestamp
 ORDER BY timestamp DESC
 ```
+
+
+
+# Comparing SMTs and AMTs
+
+SMTs support counts and sums. AMTs can do everything SMTs can, plus provide averages, maximums, and minimums. 
+
+For the workshop, I wanted to compare performance of SMTs and AMTs. While I did not have time for that in the session, I did start down that road...
+
+### Data Sources
+
+[`estore_stream`] --> [`purchases_mv`] --> [`hourly_sales_*_mv`]
+    MergeTree       AggregatingMergeTree    AggregatingMergeTree
+
+
+`estore_stream`
+```bash
+TAGS smt_amt, action_types, revenue, clean
+
+SCHEMA >
+    `action` String `json:$.action`,
+    `customer_id` String `json:$.customer_id`,
+    `product_id` String `json:$.product.product_id`,
+    `product_info` String `json:$.product`,
+    `timestamp` DateTime `json:$.timestamp`
+
+ENGINE "MergeTree"
+ENGINE_PARTITION_KEY "toYear(timestamp)"
+ENGINE_SORTING_KEY "timestamp, action, customer_id, product_id"
+```
+
+`purchases_mv`
+```bash
+SCHEMA >
+    `timestamp` DateTime,
+    `customer_id` String,
+    `product_id` String,
+    `price` Float64
+
+ENGINE "AggregatingMergeTree"
+ENGINE_PARTITION_KEY "toYYYYMM(timestamp)"
+ENGINE_SORTING_KEY "timestamp, product_id, customer_id, price"
+```
+
+`hourly_sales_summing_mv`
+```bash
+TAGS smt_amt
+
+SCHEMA >
+    `timestamp` DateTime,
+    `number_of_sales` AggregateFunction(count),
+    `sales_revenue` AggregateFunction(sum, Float64)
+
+ENGINE "SummingMergeTree"
+ENGINE_PARTITION_KEY "toYYYYMM(timestamp)"
+ENGINE_SORTING_KEY "timestamp"
+```
+
+`hourly_sales_aggregating_mv`
+```bash
+TAGS smt_amt
+
+SCHEMA >
+    `timestamp` DateTime,
+    `number_of_sales` AggregateFunction(count),
+    `sales_revenue` AggregateFunction(sum, Float64)
+
+ENGINE "AggregatingMergeTree"
+ENGINE_PARTITION_KEY "toYYYYMM(timestamp)"
+ENGINE_SORTING_KEY "timestamp"
+```
+
+## Pipes
+
+* `estore_stream` --> [`feed_hourly_sales_summing_mv`] --> `hourly_sales_summing_mv`
+* `estore_stream` --> [`feed_hourly_sales_aggregating_mv`] --> `hourly_sales_aggregating_mv`
+
+Same query for both.
+
+```sql
+TAGS smt_amt
+
+NODE generate_hourly
+SQL >
+
+    SELECT
+        toStartOfHour(timestamp) AS timestamp,
+        countState() AS number_of_sales,
+        sumState(price) AS sales_revenue
+    FROM purchases_mv
+    GROUP BY timestamp
+
+TYPE materialized
+DATASOURCE hourly_sales_summing_mv
+```
+
+## Queries
+
+`get_summing`
+```sql
+SELECT
+    toStartOfHour(timestamp) AS timestamp,
+    countMerge(number_of_sales) AS number_of_sales,
+    sumMerge(sales_revenue) AS sales_revenue
+FROM hourly_sales_summing_mv
+GROUP BY timestamp
+ORDER BY timestamp DESC
+```
+
+
+`get_aggregating`
+
+The query is the same as above except for where the data is from:
+```sql
+FROM hourly_sales_aggregating_mv
+```
