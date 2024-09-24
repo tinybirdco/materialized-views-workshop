@@ -1,13 +1,11 @@
-NODE get_hourly_sums
+NODE get_hourly_data
 SQL >
 
     SELECT
         toStartOfHour(timestamp) AS timestamp,
+        countState(price) AS sales,
         sumState(price) AS revenue
     FROM purchases_mv
     GROUP BY timestamp
-
-TYPE materialized
-DATASOURCE hourly_revenue_mv
 
 

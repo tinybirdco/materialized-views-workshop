@@ -1,0 +1,27 @@
+NODE get_hourly_sums
+SQL >
+
+    SELECT
+        toStartOfHour(timestamp) AS timestamp,
+        countMerge(sales) AS sales,
+        ROUND(sumMerge(revenue),2) AS revenue
+    FROM hourly_revenue_mv 
+    WHERE timestamp > NOW() - INTERVAL 7 DAYS
+    GROUP BY timestamp
+    ORDER BY timestamp DESC
+
+
+
+NODE test
+SQL >
+
+    SELECT
+        toStartOfHour(timestamp) AS hour,
+        ROUND(sum(JSONExtractFloat(product_info, 'price')),2) AS revenue
+    FROM estore_stream
+    WHERE hour > NOW() - INTERVAL 7 DAYS
+    AND action = 'purchase'
+    GROUP BY hour
+    ORDER BY hour DESC
+
+

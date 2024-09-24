@@ -5,6 +5,6 @@ SCHEMA >
     `customer_id` String,
     `product_id` String
 
-ENGINE "ReplacingMergeTree"
+ENGINE "AggregatingMergeTree"
 ENGINE_PARTITION_KEY "toYYYYMM(timestamp)"
-ENGINE_SORTING_KEY "timestamp, customer_id, product_id"
+ENGINE_SORTING_KEY "timestamp, product_id, customer_id"

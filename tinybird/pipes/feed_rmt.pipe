@@ -1,0 +1,10 @@
+NODE select_all
+SQL >
+
+    SELECT * 
+    FROM duplicates
+
+TYPE materialized
+DATASOURCE dedupped_rmt
+
+

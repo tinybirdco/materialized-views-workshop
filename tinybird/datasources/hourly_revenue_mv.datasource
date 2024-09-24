@@ -2,6 +2,7 @@
 
 SCHEMA >
     `timestamp` DateTime,
+    `sales` AggregateFunction(count, Float64),
     `revenue` AggregateFunction(sum, Float64)
 
 ENGINE "AggregatingMergeTree"

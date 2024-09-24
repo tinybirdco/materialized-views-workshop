@@ -1,0 +1,11 @@
+
+SCHEMA >
+    `action` String,
+    `customer_id` String,
+    `product_id` String,
+    `product_info` String,
+    `timestamp` DateTime
+
+ENGINE "MergeTree"
+ENGINE_PARTITION_KEY "toYear(timestamp)"
+ENGINE_SORTING_KEY "timestamp, action, customer_id, product_id"

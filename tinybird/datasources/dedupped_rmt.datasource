@@ -1,12 +1,11 @@
-# Data Source created from Pipe 'feed_returns_mv'
+# Data Source created from Pipe 'feed_rmt'
 
 SCHEMA >
-    `timestamp` DateTime,
-    `product_id` String,
+    `action` String,
     `customer_id` String,
-    `brand` String,
-    `model` String,
-    `price` Float32
+    `product_id` String,
+    `product_info` String,
+    `timestamp` DateTime
 
 ENGINE "ReplacingMergeTree"
 ENGINE_PARTITION_KEY "toYYYYMM(timestamp)"

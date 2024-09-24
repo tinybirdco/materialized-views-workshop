@@ -1,11 +1,16 @@
 NODE select_carts
 SQL >
 
-    SELECT timestamp, 
-    customer_id, 
-    product_id
+    SELECT
+        timestamp,
+        customer_id,
+        product_id
     FROM estore_stream
     WHERE action = 'cart'
+    GROUP BY
+        timestamp,
+        customer_id,
+        product_id
 
 TYPE materialized
 DATASOURCE carts_mv

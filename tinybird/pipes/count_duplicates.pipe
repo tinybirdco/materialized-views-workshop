@@ -1,0 +1,38 @@
+NODE count_items
+SQL >
+
+    SELECT COUNT() AS counts_dedupped_duplicates 
+    FROM dedupped_rmt
+    UNION ALL
+    SELECT COUNT() AS count_from_duplicates 
+    FROM duplicates
+
+
+
+NODE count_duplicate_dups
+SQL >
+
+    SELECT SUM(duplicate_count) as total_duplicates
+        FROM (
+            SELECT timestamp, product_id, COUNT(*) -1 as duplicate_count 
+            FROM duplicates 
+            WHERE timestamp > NOW() - INTERVAL 10 MINUTES
+            GROUP BY timestamp, product_id
+            HAVING COUNT(*) > 1
+        ) AS subquery
+
+
+
+NODE count_duplicates_dedupped
+SQL >
+
+    SELECT SUM(duplicate_count) as total_duplicates
+        FROM (
+            SELECT timestamp, product_id, COUNT(*) -1 as duplicate_count 
+            FROM dedupped_rmt FINAL
+            WHERE timestamp > NOW() - INTERVAL 10 MINUTES
+            GROUP BY timestamp, product_id
+            HAVING COUNT(*) > 1
+        ) AS subquery
+
+

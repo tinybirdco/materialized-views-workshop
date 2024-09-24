@@ -1,0 +1,10 @@
+
+SCHEMA >
+    `action` String `json:$.action`,
+    `customer_id` String `json:$.customer_id`,
+    `product_product_id` String `json:$.product.product_id`,
+    `timestamp` DateTime64(3) `json:$.timestamp`
+
+ENGINE "MergeTree"
+ENGINE_PARTITION_KEY "toYear(timestamp)"
+ENGINE_SORTING_KEY "timestamp, action, customer_id, product_product_id"

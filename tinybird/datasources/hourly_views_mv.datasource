@@ -1,4 +1,3 @@
-# Data Source created from Pipe 'feed_hourly_views_mv'
 
 SCHEMA >
     `timestamp` DateTime,

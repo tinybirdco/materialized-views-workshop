@@ -1,0 +1,13 @@
+NODE select_views
+SQL >
+
+    SELECT timestamp, 
+    customer_id, 
+    product_id
+    FROM estore_stream
+    WHERE action = 'view'
+
+TYPE materialized
+DATASOURCE views_mv
+
+

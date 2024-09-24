@@ -1,0 +1,13 @@
+NODE select_uncarts
+SQL >
+
+    SELECT timestamp, 
+    customer_id, 
+    product_id
+    FROM estore_stream
+    WHERE action = 'uncart'
+
+TYPE materialized
+DATASOURCE views_mv
+
+

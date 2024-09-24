@@ -1,12 +1,18 @@
 NODE select_purchases
 SQL >
 
-    SELECT timestamp, 
-    customer_id, 
-    product_id,
-    JSONExtractFloat(product_info, 'price') AS price
+    SELECT
+        timestamp,
+        customer_id,
+        product_id,
+        JSONExtractFloat(product_info, 'price') AS price
     FROM estore_stream
     WHERE action = 'purchase'
+    GROUP BY
+        timestamp,
+        product_id,
+        customer_id,
+        price
 
 TYPE materialized
 DATASOURCE purchases_mv

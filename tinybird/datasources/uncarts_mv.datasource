@@ -1,4 +1,3 @@
-# Data Source created from Pipe 'feed_uncarts_mv'
 
 SCHEMA >
     `timestamp` DateTime,

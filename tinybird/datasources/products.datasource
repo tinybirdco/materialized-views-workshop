@@ -1,0 +1,10 @@
+
+SCHEMA >
+    `product_id` String,
+    `brand` String,
+    `model` String,
+    `price` Float32,
+    `number_on_hand` Int32
+
+ENGINE "MergeTree"
+ENGINE_SORTING_KEY "brand, model, number_on_hand"
