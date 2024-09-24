@@ -74,6 +74,8 @@ The user story here is preparing data for another group that needs product metad
 
 Deduplicating a `duplicates` table into a `dedupped_rmt` table.
 
+Here is the schema of the `duplicates` Data Source:
+
 ```bash
 SCHEMA >
     `action` String,
@@ -173,8 +175,8 @@ For the workshop, I wanted to compare performance of SMTs and AMTs. While I did 
 
 ### Data Sources
 
-[`estore_stream`] --> [`purchases_mv`] --> [`hourly_sales_*_mv`]
-    MergeTree       AggregatingMergeTree    AggregatingMergeTree
+* [`estore_stream`] --> [   `purchases_mv`   ] --> [`hourly_sales_*_mv` ]
+* [   MergeTree   ] --> [AggregatingMergeTree] --> [AggregatingMergeTree]
 
 
 `estore_stream`
