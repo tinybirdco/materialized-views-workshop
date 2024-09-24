@@ -65,13 +65,13 @@ RMT MVs should only feed other RMTs to maintain the promise of deduplicated data
 
 ## Database table engines 
 
-* MergeTree -  is the foundational storage engine for ClickHouse and serves as the core of its more specialized engines.
+* **MergeTree** -  is the foundational storage engine for ClickHouse and serves as the core of its more specialized engines.
    * Uses columnar storage, meaning data for each column is stored separately. This design drastically reduces I/O for analytical queries that often only need a subset of the columns, leading to significant performance improvements.
    * can handle large volumes of data, both in terms of storage size and the number of rows. It is designed to work efficiently on a single node or across distributed clusters.
    * is optimized for fast data ingestion and querying, making it suitable for scenarios involving high-throughput insertions and complex analytical queries.
-* ReplacingMergeTree - is best when you need to manage the latest version of data or remove duplicates, particularly in time-series data with potential repeated events.
-* AggregatingMergeTree - is ideal for situations requiring data pre-aggregation, reducing the computational load during read queries. This is especially valuable for dashboards and analytics.
-* CollapsingMergeTree (and VersionedCollapsingMegreTree) - designed for scenarios where you need to track changes (like deletions) without actually removing data immediately from the storage. Instead of directly deleting rows, CollapsingMergeTree uses a special column called `sign` to mark the state of each row.
+* **ReplacingMergeTree** - is best when you need to manage the latest version of data or remove duplicates, particularly in time-series data with potential repeated events.
+* **AggregatingMergeTree** - is ideal for situations requiring data pre-aggregation, reducing the computational load during read queries. This is especially valuable for dashboards and analytics.
+* **CollapsingMergeTree** (and **VersionedCollapsingMegreTree**) - designed for scenarios where you need to track changes (like deletions) without actually removing data immediately from the storage. Instead of directly deleting rows, CollapsingMergeTree uses a special column called `sign` to mark the state of each row.
    * The sign column is crucial in CollapsingMergeTree and must be managed entirely by the client (application).
    * sign = 1: Indicates a valid (current) row, representing the latest state or addition of data.
    * sign = -1: Indicates that the corresponding row should be considered as "removed," "forgotten," or logically deleted. This does not delete the row immediately; it marks it for removal during future merges.  
