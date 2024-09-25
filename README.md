@@ -19,8 +19,8 @@ We have a lot of Materialized Views-related resources to learn more.
 * [Master Materialized Views · Tinybird Docs](https://www.tinybird.co/docs/guides/publishing-data/master-materialized-views)
 * [Understanding the Materialized JOIN issue](https://www.tinybird.co/docs/guides/optimizations/opt201-fix-mistakes#5-are-you-joining-two-or-more-data-sources)
 * [Build a lambda architecture in Tinybird](https://www.tinybird.co/docs/guides/querying-data/lambda-architecture)
-* [Roll up data with Materialized Views](https://www.tinybird.co/blog-posts/roll-up-data-with-materialized-views) 
-* [Chaining ReplacingMergeTree Data Sources](https://github.com/tinybirdco/replacingmergetreemvstrap?tab=readme-ov-file)
+* [Blog post: Roll up data with Materialized Views](https://www.tinybird.co/blog-posts/roll-up-data-with-materialized-views) 
+* [Chaining ReplacingMergeTree Data Sources](https://github.com/tinybirdco/replacingmergetreemvstrap?tab=readme-ov-file) - a Github repo that describes the pitfalls of chaining MVs together. 
 
 ## What is a Materialized View?
 
@@ -98,7 +98,16 @@ The script enforces some rules:
 * Before a product can be placed in the cart, it must be viewed. 
 * Before it can be purchased, the product must be in the customer's cart. 
 * Only carted products can be uncarted. 
-* Only purchased products can be returned.
+* Only purchased products can be returned. If more than one of an item is purchased, multiple `purchase` actions are triggered. 
+
+One basic detail this generator does NOT handle is updated prices. The generated data uses 100% static prices. So, prices do not change, they are set in a (Postgres) table, and the only time a price is included in generated Events API payloads is when a `purchase` action is triggered. 
+
+### Action events
+
+The `view` action includes the basics that every event has:
+* `timestamp` - marking when the event was triggered.
+* `product_id` - every event is about a single product. The product ID is always included in a `product` (child) object. For purchase actions, a product `price` attribute is aded. If more than one product is purchased, multiple `purchase` events are triggered. 
+* `customer_id` - every action is driven by a single customer.
 
 An example `view` event: 
 
